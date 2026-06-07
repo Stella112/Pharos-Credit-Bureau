@@ -30,15 +30,27 @@ Example:
 Use $pharos-credit-bureau to assess this Pharos agent before I send 5,000 USDC. Tell me whether to proceed, cap exposure, require escrow, or reject.
 ```
 
-## MVP Demo
+## Live Demo
 
-The demo compares three counterparties:
+Run a real-address report from Pharos RPC:
 
-- `Live Pharos Sender Sample`: real Pharos mainnet address with strong demo scoring inputs.
-- `Nova Settlement Agent`: usable but needs capped exposure or escrow.
-- `Live Pharos Receiver Sample`: real Pharos mainnet address with risky demo scoring inputs.
+```bash
+npm run live -- --address 0x6b16be825b84d9a61b5ae370ea75dcd537555555 --amount 5000
+```
 
-The sample addresses come from recent Pharosscan mainnet activity. The score inputs are bundled demo profiles, not live credit claims about those addresses.
+Run another real address:
+
+```bash
+npm run live -- --address 0x530d077fbe88add82736eb825fb1e202ed93b147 --amount 5000 --known-contract
+```
+
+Live mode fetches real Pharos chain ID, latest block, native balance, sent transaction count/nonce, and contract code from Pharos JSON-RPC. It does not fabricate repayment, escrow, token, sanctions, or attestation data. Missing signals lower confidence.
+
+Browser JSON endpoint after `npm start`:
+
+```text
+http://localhost:4173/api/live-report?address=0x6b16be825b84d9a61b5ae370ea75dcd537555555&amount=5000
+```
 
 Sentinel then reviews a proposed onchain action against the credit report. It can:
 
@@ -54,13 +66,13 @@ npm start
 
 Open `http://localhost:4173`.
 
-Run the CLI demo:
+Run the offline comparison:
 
 ```bash
 npm run demo
 ```
 
-Generate a deterministic skill report from a request file:
+Generate an offline deterministic skill report from a request file:
 
 ```bash
 npm run report -- assets/credit-request-prime.json
@@ -128,6 +140,7 @@ This keeps the bureau useful for AI-native execution without pretending an advis
 ## Next Build Steps
 
 - Replace sample profiles with a Pharos indexer adapter.
+- Add optional SocialScan API support for transaction history when an API key is available.
 - Add a contract/protocol allowlist registry.
 - Add signed credit receipts for agent workflows.
 - Store completed escrow outcomes as bureau input.

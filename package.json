@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node scripts/serve.js",
     "demo": "node scripts/demo.js",
+    "live": "node scripts/live-report.js",
     "report": "node scripts/credit-report.js",
     "test": "node --test"
   },

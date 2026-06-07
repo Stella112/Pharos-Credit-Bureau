@@ -17,9 +17,9 @@ Default to read-only analysis. Do not send a transaction, approve a contract int
 
 1. Capture the subject: wallet, agent, DAO, protocol, or counterparty address.
 2. Capture the intended action: amount, asset, network, target contract, mission, deadline, and whether escrow is available.
-3. Gather available signals from user input, Pharos indexers, escrow/task history, attestations, protocol registries, or bundled sample profiles.
+3. Gather available signals from live Pharos RPC, Pharos indexers, escrow/task history, attestations, protocol registries, or user-provided profiles.
 4. Build a profile using `references/profile-schema.md`.
-5. Score the profile using `references/scoring-rubric.md` or run `node scripts/credit-report.js <request.json>`.
+5. Score the profile using `references/scoring-rubric.md`, `node scripts/live-report.js --address <addr>`, or `node scripts/credit-report.js <request.json>`.
 6. Apply Sentinel using `references/sentinel-policy.md` or the SDK function `reviewActionWithCredit`.
 7. Return a Credit Bureau Report and action decision in the output format below.
 
@@ -46,9 +46,19 @@ Useful:
 - sanctions/mixer/compliance flags,
 - whether a known contract or allowlist exists.
 
-Use `assets/credit-request-prime.json` and `assets/credit-request-risky.json` as request templates.
+Use live mode for real addresses. Use `assets/credit-request-prime.json` and `assets/credit-request-risky.json` only as offline request templates.
 
-## Deterministic Report CLI
+## Live Pharos Report CLI
+
+When the user provides an address, prefer live RPC mode:
+
+```bash
+node scripts/live-report.js --address 0x6b16be825b84d9a61b5ae370ea75dcd537555555 --network pharos-mainnet --amount 5000
+```
+
+Live mode fetches real Pharos chain ID, latest block, native balance, sent transaction count/nonce, and contract code from Pharos JSON-RPC. Public RPC cannot fully observe repayment history, escrow outcomes, sanctions, or token history; missing signals must lower confidence.
+
+## Structured Report CLI
 
 When Node.js is available and the user provides a structured request, prefer the CLI:
 
@@ -73,7 +83,7 @@ Request shape:
 }
 ```
 
-If no live data is available, clearly label the report as sample-data, user-provided, or low-confidence.
+If full indexer/attestation data is unavailable, clearly label the report as live-RPC-limited or low-confidence. Do not fabricate clean repayment, escrow, compliance, or token history.
 
 ## Output Format
 
@@ -107,11 +117,12 @@ For moderate-risk counterparties, prefer capped exposure plus escrow over direct
 ## Bundled Resources
 
 - `src/creditBureau.js`: reusable scoring and Sentinel review functions.
+- `src/pharosLive.js`: live Pharos RPC profile collector.
+- `scripts/live-report.js`: real-address live report CLI.
 - `scripts/credit-report.js`: deterministic JSON report CLI.
-- `scripts/demo.js`: compare the bundled sample counterparties.
-- `data/sample-profiles.json`: demo profiles.
+- `scripts/demo.js`: compare bundled offline fixtures.
+- `data/sample-profiles.json`: offline profiles for local UI fallback.
 - `references/profile-schema.md`: supported profile fields.
 - `references/scoring-rubric.md`: score and confidence model.
 - `references/sentinel-policy.md`: execution gate policy.
 - `index.html`: optional local dashboard demo.
-

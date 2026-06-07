@@ -52,3 +52,14 @@ Confidence should drop when:
 
 Never treat missing data as clean history. Unknown means uncertain, not safe.
 
+## Live RPC Mode
+
+Live RPC mode observes only:
+
+- chain ID,
+- latest block,
+- native balance,
+- sent transaction count/nonce,
+- deployed contract code.
+
+It does not observe full credit history by itself. Unless a full indexer, escrow ledger, attestation registry, or compliance source is connected, the report should carry a `LIMITED_LIVE_DATA` flag and lower confidence.

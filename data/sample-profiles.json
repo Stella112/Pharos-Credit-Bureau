@@ -24,7 +24,7 @@
     "bridgeFailureCount": 0,
     "mixerInteractions": 0,
     "sanctionsHit": false,
-    "dataSources": ["pharosscan-live-address", "demo-credit-inputs", "escrow-ledger", "attestation-registry"],
+    "dataSources": ["pharosscan-live-address", "offline-credit-fixture", "escrow-ledger", "attestation-registry"],
     "lastUpdatedHoursAgo": 2
   },
   {
@@ -80,7 +80,7 @@
     "bridgeFailureCount": 3,
     "mixerInteractions": 1,
     "sanctionsHit": false,
-    "dataSources": ["pharosscan-live-address", "demo-risk-inputs"],
+    "dataSources": ["pharosscan-live-address", "offline-risk-fixture"],
     "lastUpdatedHoursAgo": 31
   }
 ]

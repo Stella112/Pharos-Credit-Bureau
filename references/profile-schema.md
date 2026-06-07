@@ -58,3 +58,15 @@ Use these fields when building a counterparty profile. Missing fields are allowe
 | `dataSources` | string[] | Sources used, such as indexer, escrow ledger, attestation registry. |
 | `lastUpdatedHoursAgo` | number | Freshness of the newest report data. |
 
+## Live RPC Fields
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `liveDataMode` | boolean | Whether the report was built from live Pharos RPC. |
+| `nativeBalance` | string | Native token balance returned by RPC. |
+| `nativeToken` | string | `PROS` for mainnet or `PHRS` for Atlantic testnet. |
+| `latestBlock` | number | Latest observed block number. |
+| `contractCodePresent` | boolean | Whether `eth_getCode` returned deployed code. |
+| `explorerUrl` | string | Explorer URL for the subject address. |
+| `observedSignals` | object | Which risk dimensions were actually observed. Missing dimensions lower confidence. |
+| `rawLiveSignals` | object | Raw live RPC facts included for auditability. |

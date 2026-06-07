@@ -24,7 +24,7 @@
     "bridgeFailureCount": 3,
     "mixerInteractions": 1,
     "sanctionsHit": false,
-    "dataSources": ["pharosscan-live-address", "demo-risk-inputs"],
+    "dataSources": ["pharosscan-live-address", "offline-risk-fixture"],
     "lastUpdatedHoursAgo": 31
   },
   "context": {

@@ -76,6 +76,15 @@ function buildFlags(profile) {
   const flags = [];
   const failedRate = ratio(profile.failedTransactions, profile.transactionCount);
   const disputeRate = ratio(profile.escrowsDisputed, profile.escrowsCompleted + profile.escrowsDisputed);
+  const observedSignals = profile.observedSignals || {};
+
+  if (profile.liveDataMode && observedSignals.scope !== "full-indexer") {
+    flags.push({
+      severity: "medium",
+      code: "LIMITED_LIVE_DATA",
+      message: "Live report uses public RPC signals only; repayment, escrow, compliance, and token history were not fully observed."
+    });
+  }
 
   if (profile.sanctionsHit) {
     flags.push({
@@ -141,7 +150,7 @@ function buildFlags(profile) {
     });
   }
 
-  if (profile.walletAgeDays < 30) {
+  if (profile.walletAgeDays !== undefined && profile.walletAgeDays < 30) {
     flags.push({
       severity: "medium",
       code: "NEW_WALLET",
@@ -149,10 +158,28 @@ function buildFlags(profile) {
     });
   }
 
+  if (profile.liveDataMode && Number(profile.transactionCount || 0) === 0) {
+    flags.push({
+      severity: "medium",
+      code: "NO_SENT_TX_HISTORY",
+      message: "Live RPC nonce shows no sent transaction history for this address."
+    });
+  }
+
+  if (profile.contractCodePresent) {
+    flags.push({
+      severity: "medium",
+      code: "CONTRACT_ACCOUNT",
+      message: "Address has deployed contract code; review protocol/admin risk before funds move."
+    });
+  }
+
   return flags;
 }
 
 function factorScore(profile) {
+  const observedSignals = profile.observedSignals || null;
+  const observed = signal => !observedSignals || Boolean(observedSignals[signal]);
   const totalTransactions = Number(profile.transactionCount || 0);
   const failedRate = ratio(profile.failedTransactions, totalTransactions);
   const successRate = ratio(profile.successfulTransactions, totalTransactions, 0.5);
@@ -160,6 +187,19 @@ function factorScore(profile) {
   const escrowSuccessRate = ratio(profile.escrowsCompleted, totalEscrows, totalEscrows ? 0 : 0.5);
   const repaymentTotal = Number(profile.repaymentsOnTime || 0) + Number(profile.repaymentsLate || 0) + Number(profile.defaults || 0);
   const repaymentScore = ratio(profile.repaymentsOnTime, repaymentTotal, repaymentTotal ? 0 : 0.5);
+  const successComponent = observed("txOutcomes") ? successRate * 100 : totalTransactions ? clamp(35 + scale(totalTransactions, 300) * 0.25) : 20;
+  const escrowComponent = observed("escrowHistory") ? escrowSuccessRate * 100 : 25;
+  const deliveryComponent = observed("deliveryHistory") ? Number(profile.onTimeDeliveryRate || 0) * 100 : 25;
+  const failedComponent = observed("txOutcomes") ? clamp(100 - failedRate * 260) : 35;
+  const unknownContractsComponent = observed("contractRisk") ? clamp(100 - Number(profile.unknownContractInteractions90d || 0) * 4) : 35;
+  const riskyProtocolComponent = observed("protocolRisk") ? clamp(100 - Number(profile.riskyProtocolExposurePct || 0) * 140) : 35;
+  const bridgeComponent = observed("bridgeRisk") ? clamp(100 - Number(profile.bridgeFailureCount || 0) * 18) : 45;
+  const complianceComponent = observed("compliance") ? (profile.sanctionsHit ? 0 : 100) : 30;
+  const mixerComponent = observed("compliance") ? (profile.mixerInteractions ? 0 : 100) : 30;
+  const repaymentComponent = observed("repaymentHistory") ? repaymentScore * 100 : 25;
+  const rwaComponent = observed("rwaHistory") ? scale(profile.rwaProtocolInteractions, 10) : 20;
+  const attestationComponent = observed("compliance") ? scale(profile.complianceAttestations, 3) : 20;
+  const defaultComponent = observed("repaymentHistory") ? (profile.defaults ? 0 : 100) : 25;
 
   const scores = {
     history: (
@@ -168,27 +208,27 @@ function factorScore(profile) {
       scale(profile.pharosInteractions, 250) * 0.2
     ),
     reliability: (
-      successRate * 100 * 0.32 +
-      escrowSuccessRate * 100 * 0.28 +
-      Number(profile.onTimeDeliveryRate || 0) * 100 * 0.24 +
-      clamp(100 - failedRate * 260) * 0.16
+      successComponent * 0.32 +
+      escrowComponent * 0.28 +
+      deliveryComponent * 0.24 +
+      failedComponent * 0.16
     ),
     liquidity: (
       scale(profile.stablecoinBalanceUsd, 50000) * 0.58 +
       scale(profile.averageBalanceUsd90d, 35000) * 0.42
     ),
     riskExposure: (
-      clamp(100 - Number(profile.riskyProtocolExposurePct || 0) * 140) * 0.36 +
-      clamp(100 - Number(profile.unknownContractInteractions90d || 0) * 4) * 0.3 +
-      clamp(100 - Number(profile.bridgeFailureCount || 0) * 18) * 0.16 +
-      (profile.mixerInteractions ? 0 : 100) * 0.1 +
-      (profile.sanctionsHit ? 0 : 100) * 0.08
+      riskyProtocolComponent * 0.36 +
+      unknownContractsComponent * 0.3 +
+      bridgeComponent * 0.16 +
+      mixerComponent * 0.1 +
+      complianceComponent * 0.08
     ),
     realFi: (
-      repaymentScore * 100 * 0.36 +
-      scale(profile.rwaProtocolInteractions, 10) * 0.26 +
-      scale(profile.complianceAttestations, 3) * 0.24 +
-      (profile.defaults ? 0 : 100) * 0.14
+      repaymentComponent * 0.36 +
+      rwaComponent * 0.26 +
+      attestationComponent * 0.24 +
+      defaultComponent * 0.14
     ),
     dataQuality: (
       scale((profile.dataSources || []).length, 4) * 0.48 +
