@@ -3,6 +3,10 @@ const NETWORKS = {
     name: "pharos-mainnet",
     aliases: ["mainnet", "pharos"],
     rpcUrl: "https://rpc.pharos.xyz",
+    rpcUrls: [
+      "https://rpc.pharos.xyz",
+      "https://pharos-mainnet.g.alchemy.com/v2/docs-demo"
+    ],
     chainId: 1672,
     explorerUrl: "https://www.pharosscan.xyz",
     nativeToken: "PROS"
@@ -11,6 +15,7 @@ const NETWORKS = {
     name: "pharos-atlantic-testnet",
     aliases: ["atlantic-testnet", "testnet", "atlantic"],
     rpcUrl: "https://atlantic.dplabs-internal.com",
+    rpcUrls: ["https://atlantic.dplabs-internal.com"],
     chainId: 688689,
     explorerUrl: "https://atlantic.pharosscan.xyz",
     nativeToken: "PHRS"
@@ -49,8 +54,8 @@ function formatEther(hexWei) {
   return fractionText ? `${whole}.${fractionText}` : whole.toString();
 }
 
-async function rpc(network, method, params = []) {
-  const response = await fetch(network.rpcUrl, {
+async function rpcUrl(url, method, params = []) {
+  const response = await fetch(url, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
@@ -73,9 +78,32 @@ async function rpc(network, method, params = []) {
   return payload.result;
 }
 
-export async function fetchLivePharosProfile({ address, network = "pharos-mainnet", label }) {
+async function rpc(network, method, params = []) {
+  const urls = network.rpcUrls || [network.rpcUrl];
+  const errors = [];
+
+  for (const url of urls) {
+    try {
+      const result = await rpcUrl(url, method, params);
+      return { result, rpcUrl: url };
+    } catch (error) {
+      errors.push(`${url}: ${error.message}`);
+    }
+  }
+
+  throw new Error(`All RPC endpoints failed for ${method}. ${errors.join(" | ")}`);
+}
+
+export async function fetchLivePharosProfile({ address, network = "pharos-mainnet", label, rpcUrl }) {
   assertAddress(address);
-  const chain = normalizeNetwork(network);
+  const baseChain = normalizeNetwork(network);
+  const chain = rpcUrl
+    ? {
+        ...baseChain,
+        rpcUrl,
+        rpcUrls: [rpcUrl, ...(baseChain.rpcUrls || []).filter(url => url !== rpcUrl)]
+      }
+    : baseChain;
   const [chainIdHex, latestBlockHex, balanceHex, nonceHex, code] = await Promise.all([
     rpc(chain, "eth_chainId"),
     rpc(chain, "eth_blockNumber"),
@@ -84,15 +112,22 @@ export async function fetchLivePharosProfile({ address, network = "pharos-mainne
     rpc(chain, "eth_getCode", [address, "latest"])
   ]);
 
-  const observedChainId = hexToNumber(chainIdHex);
+  const observedChainId = hexToNumber(chainIdHex.result);
   if (observedChainId !== chain.chainId) {
     throw new Error(`RPC chain ID mismatch: expected ${chain.chainId}, got ${observedChainId}`);
   }
 
-  const transactionCount = hexToNumber(nonceHex);
-  const nativeBalance = formatEther(balanceHex);
+  const transactionCount = hexToNumber(nonceHex.result);
+  const nativeBalance = formatEther(balanceHex.result);
   const nativeBalanceNumber = Number(nativeBalance);
-  const contractCodePresent = Boolean(code && code !== "0x");
+  const contractCodePresent = Boolean(code.result && code.result !== "0x");
+  const usedRpcUrls = [...new Set([
+    chainIdHex.rpcUrl,
+    latestBlockHex.rpcUrl,
+    balanceHex.rpcUrl,
+    nonceHex.rpcUrl,
+    code.rpcUrl
+  ])];
 
   return {
     address,
@@ -117,7 +152,7 @@ export async function fetchLivePharosProfile({ address, network = "pharos-mainne
     contractCodePresent,
     nativeBalance,
     nativeToken: chain.nativeToken,
-    latestBlock: hexToNumber(latestBlockHex),
+    latestBlock: hexToNumber(latestBlockHex.result),
     explorerUrl: `${chain.explorerUrl}/address/${address}`,
     dataSources: ["pharos-json-rpc-live"],
     lastUpdatedHoursAgo: 0,
@@ -137,9 +172,11 @@ export async function fetchLivePharosProfile({ address, network = "pharos-mainne
       compliance: false
     },
     rawLiveSignals: {
-      rpcUrl: chain.rpcUrl,
+      primaryRpcUrl: chain.rpcUrl,
+      usedRpcUrls,
+      fallbackUsed: usedRpcUrls.some(url => url !== chain.rpcUrl),
       chainId: observedChainId,
-      latestBlock: hexToNumber(latestBlockHex),
+      latestBlock: hexToNumber(latestBlockHex.result),
       nonce: transactionCount,
       nativeBalance,
       nativeToken: chain.nativeToken,
@@ -150,4 +187,3 @@ export async function fetchLivePharosProfile({ address, network = "pharos-mainne
 }
 
 export { NETWORKS };
-

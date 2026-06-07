@@ -46,6 +46,12 @@ npm run live -- --address 0x530d077fbe88add82736eb825fb1e202ed93b147 --amount 50
 
 Live mode fetches real Pharos chain ID, latest block, native balance, sent transaction count/nonce, and contract code from Pharos JSON-RPC. It does not fabricate repayment, escrow, token, sanctions, or attestation data. Missing signals lower confidence.
 
+If the default Pharos RPC times out on your network, pass a fallback RPC:
+
+```bash
+npm run live -- --address 0x6b16be825b84d9a61b5ae370ea75dcd537555555 --amount 5000 --rpc-url https://pharos-mainnet.g.alchemy.com/v2/docs-demo
+```
+
 Browser JSON endpoint after `npm start`:
 
 ```text
