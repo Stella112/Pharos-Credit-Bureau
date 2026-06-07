@@ -6,6 +6,18 @@ This repository is a Codex Skill. The main entry point is [`SKILL.md`](./SKILL.m
 
 ## Skill Invocation
 
+Install from GitHub:
+
+```bash
+npx skills add https://github.com/Stella112/Pharos-Credit-Bureau
+```
+
+For Codex global installation:
+
+```bash
+npx skills add https://github.com/Stella112/Pharos-Credit-Bureau -a codex -g -y
+```
+
 Use:
 
 ```text
