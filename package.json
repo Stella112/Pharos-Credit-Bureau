@@ -1,0 +1,24 @@
+{
+  "name": "pharos-credit-bureau",
+  "version": "0.1.0",
+  "description": "Counterparty risk intelligence and Sentinel-gated exposure limits for AI agents on Pharos.",
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/serve.js",
+    "demo": "node scripts/demo.js",
+    "test": "node --test"
+  },
+  "keywords": [
+    "pharos",
+    "realfi",
+    "credit",
+    "risk",
+    "ai-agents",
+    "sentinel"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}
+

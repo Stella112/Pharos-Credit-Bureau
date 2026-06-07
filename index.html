@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pharos Credit Bureau</title>
+    <link rel="stylesheet" href="./src/styles.css">
+  </head>
+  <body>
+    <div id="app" class="shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="mark" aria-hidden="true">PCB</div>
+          <div>
+            <h1>Pharos Credit Bureau</h1>
+            <p class="subtitle">Counterparty risk intelligence for AI agents</p>
+          </div>
+        </div>
+        <span class="status-pill">Pharos ready</span>
+      </header>
+
+      <main class="grid">
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>Credit Report</h2>
+              <p id="profileMeta">Loading profile</p>
+            </div>
+            <label class="selector">
+              Counterparty
+              <select id="profileSelect"></select>
+            </label>
+          </div>
+
+          <div class="panel-body">
+            <div class="score-layout">
+              <div id="scoreRing" class="score-ring" aria-label="Counterparty credit score">
+                <div>
+                  <strong id="score">0</strong>
+                  <span>score</span>
+                </div>
+              </div>
+              <div class="score-copy">
+                <span id="riskBand" class="pill">unknown</span>
+                <h3 id="recommendation">Loading</h3>
+                <p id="rationale">Loading report rationale.</p>
+              </div>
+            </div>
+
+            <div class="metrics">
+              <div class="metric">
+                <span>Confidence</span>
+                <strong id="confidence">0%</strong>
+              </div>
+              <div class="metric">
+                <span>Exposure cap</span>
+                <strong id="exposureCap">$0</strong>
+              </div>
+              <div class="metric">
+                <span>Wallet age</span>
+                <strong id="walletAge">0 days</strong>
+              </div>
+              <div class="metric">
+                <span>Transactions</span>
+                <strong id="txCount">0</strong>
+              </div>
+            </div>
+
+            <div class="split">
+              <div>
+                <h3>Factor Scores</h3>
+                <ul id="factors" class="factor-list"></ul>
+              </div>
+              <div>
+                <h3>Risk Flags</h3>
+                <ul id="flags" class="flag-list"></ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <aside class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>Sentinel Review</h2>
+              <p>Credit-aware action gate</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <form class="action-form" onsubmit="return false">
+              <label>
+                Proposed amount
+                <input id="amount" type="number" min="0" step="100">
+              </label>
+              <label>
+                Network
+                <select id="network">
+                  <option value="pharos-mainnet">pharos-mainnet</option>
+                  <option value="pharos-atlantic-testnet">pharos-atlantic-testnet</option>
+                  <option value="ethereum-mainnet">ethereum-mainnet</option>
+                </select>
+              </label>
+              <div class="switches">
+                <label class="toggle">
+                  Known contract
+                  <input id="knownContract" type="checkbox">
+                </label>
+                <label class="toggle">
+                  Mission aligned
+                  <input id="missionAligned" type="checkbox">
+                </label>
+              </div>
+              <button id="runSentinel" type="button">Run Sentinel Review</button>
+            </form>
+
+            <div id="sentinelDecision" class="decision">review</div>
+            <ul id="sentinelReasons" class="reasons"></ul>
+            <ul id="checks" class="checks"></ul>
+
+            <div class="visual">
+              <canvas id="riskGraph" width="560" height="320" aria-label="Risk factor graph"></canvas>
+            </div>
+          </div>
+        </aside>
+      </main>
+    </div>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
+
