@@ -1,7 +1,7 @@
 {
   "profile": {
-    "address": "0xF1a5hY13ldB07000000000000000000000000003",
-    "label": "Flash Yield Bot",
+    "address": "0x530d077fbe88add82736eb825fb1e202ed93b147",
+    "label": "Live Pharos Receiver Sample",
     "type": "agent",
     "network": "pharos-mainnet",
     "walletAgeDays": 9,
@@ -24,7 +24,7 @@
     "bridgeFailureCount": 3,
     "mixerInteractions": 1,
     "sanctionsHit": false,
-    "dataSources": ["pharos-indexer"],
+    "dataSources": ["pharosscan-live-address", "demo-risk-inputs"],
     "lastUpdatedHoursAgo": 31
   },
   "context": {
@@ -37,4 +37,3 @@
     "missionAligned": true
   }
 }
-

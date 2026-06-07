@@ -1,7 +1,7 @@
 [
   {
-    "address": "0xA71a5C0Re000000000000000000000000000001",
-    "label": "Atlas Treasury Ops",
+    "address": "0x6b16be825b84d9a61b5ae370ea75dcd537555555",
+    "label": "Live Pharos Sender Sample",
     "type": "agent",
     "network": "pharos-mainnet",
     "walletAgeDays": 438,
@@ -24,7 +24,7 @@
     "bridgeFailureCount": 0,
     "mixerInteractions": 0,
     "sanctionsHit": false,
-    "dataSources": ["pharos-indexer", "escrow-ledger", "attestation-registry", "rwa-events"],
+    "dataSources": ["pharosscan-live-address", "demo-credit-inputs", "escrow-ledger", "attestation-registry"],
     "lastUpdatedHoursAgo": 2
   },
   {
@@ -56,8 +56,8 @@
     "lastUpdatedHoursAgo": 7
   },
   {
-    "address": "0xF1a5hY13ldB07000000000000000000000000003",
-    "label": "Flash Yield Bot",
+    "address": "0x530d077fbe88add82736eb825fb1e202ed93b147",
+    "label": "Live Pharos Receiver Sample",
     "type": "agent",
     "network": "pharos-mainnet",
     "walletAgeDays": 9,
@@ -80,8 +80,7 @@
     "bridgeFailureCount": 3,
     "mixerInteractions": 1,
     "sanctionsHit": false,
-    "dataSources": ["pharos-indexer"],
+    "dataSources": ["pharosscan-live-address", "demo-risk-inputs"],
     "lastUpdatedHoursAgo": 31
   }
 ]
-

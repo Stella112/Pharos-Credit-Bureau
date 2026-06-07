@@ -34,9 +34,11 @@ Use $pharos-credit-bureau to assess this Pharos agent before I send 5,000 USDC. 
 
 The demo compares three counterparties:
 
-- `Atlas Treasury Ops`: strong operating history and clean RealFi behavior.
+- `Live Pharos Sender Sample`: real Pharos mainnet address with strong demo scoring inputs.
 - `Nova Settlement Agent`: usable but needs capped exposure or escrow.
-- `Flash Yield Bot`: rejected because of thin history, risky exposure, and credit flags.
+- `Live Pharos Receiver Sample`: real Pharos mainnet address with risky demo scoring inputs.
+
+The sample addresses come from recent Pharosscan mainnet activity. The score inputs are bundled demo profiles, not live credit claims about those addresses.
 
 Sentinel then reviews a proposed onchain action against the credit report. It can:
 
