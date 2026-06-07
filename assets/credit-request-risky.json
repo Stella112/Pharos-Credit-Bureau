@@ -1,0 +1,40 @@
+{
+  "profile": {
+    "address": "0xF1a5hY13ldB07000000000000000000000000003",
+    "label": "Flash Yield Bot",
+    "type": "agent",
+    "network": "pharos-mainnet",
+    "walletAgeDays": 9,
+    "transactionCount": 46,
+    "pharosInteractions": 19,
+    "successfulTransactions": 34,
+    "failedTransactions": 12,
+    "stablecoinBalanceUsd": 1275,
+    "averageBalanceUsd90d": 720,
+    "escrowsCompleted": 0,
+    "escrowsDisputed": 2,
+    "onTimeDeliveryRate": 0.28,
+    "repaymentsOnTime": 0,
+    "repaymentsLate": 0,
+    "defaults": 1,
+    "rwaProtocolInteractions": 0,
+    "complianceAttestations": 0,
+    "unknownContractInteractions90d": 31,
+    "riskyProtocolExposurePct": 0.68,
+    "bridgeFailureCount": 3,
+    "mixerInteractions": 1,
+    "sanctionsHit": false,
+    "dataSources": ["pharos-indexer"],
+    "lastUpdatedHoursAgo": 31
+  },
+  "context": {
+    "requestedExposureUsd": 5000
+  },
+  "action": {
+    "amountUsd": 5000,
+    "network": "pharos-mainnet",
+    "knownContract": true,
+    "missionAligned": true
+  }
+}
+

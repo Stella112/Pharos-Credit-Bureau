@@ -256,7 +256,9 @@ export function scoreCounterparty(profile, context = {}) {
       address: profile.address,
       label: profile.label,
       type: profile.type,
-      network: profile.network
+      network: profile.network,
+      dataSources: profile.dataSources || [],
+      lastUpdatedHoursAgo: profile.lastUpdatedHoursAgo
     },
     score,
     confidence,
@@ -278,46 +280,60 @@ export function reviewActionWithCredit(action, creditReport, policy = {}) {
   const reasons = [];
   const checks = [];
 
-  function addCheck(name, passed, detail) {
-    checks.push({ name, passed, detail });
-    if (!passed) reasons.push(detail);
+  function addCheck(name, passed, passDetail, failDetail = passDetail) {
+    checks.push({ name, passed, detail: passed ? passDetail : failDetail });
+    if (!passed) reasons.push(failDetail);
   }
 
   const amountUsd = Number(action.amountUsd || 0);
+  const hasStaleData = creditReport.flags.some(flag => flag.code === "STALE_DATA");
 
   addCheck(
     "network",
     rules.allowedNetworks.includes(action.network),
+    `Network ${action.network || "unknown"} is allowed.`,
     `Unsupported network: ${action.network || "unknown"}.`
   );
   addCheck(
     "budget",
     amountUsd <= Number(rules.maxSpendUsd || 0),
+    `Amount ${amountUsd} is within policy max spend ${rules.maxSpendUsd}.`,
     `Amount ${amountUsd} exceeds policy max spend ${rules.maxSpendUsd}.`
   );
   addCheck(
     "credit_cap",
     amountUsd <= Number(creditReport.exposureCapUsd || 0),
+    `Amount ${amountUsd} is within bureau exposure cap ${creditReport.exposureCapUsd}.`,
     `Amount ${amountUsd} exceeds bureau exposure cap ${creditReport.exposureCapUsd}.`
   );
   addCheck(
     "minimum_score",
     creditReport.score >= rules.rejectBelowScore,
+    `Credit score ${creditReport.score} is above reject threshold ${rules.rejectBelowScore}.`,
     `Credit score ${creditReport.score} is below reject threshold ${rules.rejectBelowScore}.`
   );
   addCheck(
     "confidence",
     creditReport.confidence >= rules.minimumConfidence,
+    `Confidence ${creditReport.confidence} meets required ${rules.minimumConfidence}.`,
     `Confidence ${creditReport.confidence} is below required ${rules.minimumConfidence}.`
+  );
+  addCheck(
+    "freshness",
+    !hasStaleData,
+    "Credit profile data is inside the freshness window.",
+    `Credit profile data is older than the ${rules.requireFreshDataHours}-hour freshness policy.`
   );
   addCheck(
     "known_contract",
     !rules.requireKnownContract || Boolean(action.knownContract),
+    "Target contract is known or allowlisted.",
     "Target contract is not marked as known or allowlisted."
   );
   addCheck(
     "mission",
     !rules.requireMissionAlignment || Boolean(action.missionAligned),
+    "Action is aligned with the declared mission constraints.",
     "Action is outside the declared mission constraints."
   );
 
@@ -325,6 +341,7 @@ export function reviewActionWithCredit(action, creditReport, policy = {}) {
   addCheck(
     "critical_flags",
     !hasCriticalFlag,
+    "No critical credit or compliance flags are present.",
     "Critical credit or compliance flag is present."
   );
 
@@ -354,4 +371,3 @@ export function reviewActionWithCredit(action, creditReport, policy = {}) {
 }
 
 export { DEFAULT_POLICY };
-

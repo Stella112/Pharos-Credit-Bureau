@@ -1,0 +1,40 @@
+{
+  "profile": {
+    "address": "0xA71a5C0Re000000000000000000000000000001",
+    "label": "Atlas Treasury Ops",
+    "type": "agent",
+    "network": "pharos-mainnet",
+    "walletAgeDays": 438,
+    "transactionCount": 1280,
+    "pharosInteractions": 342,
+    "successfulTransactions": 1253,
+    "failedTransactions": 27,
+    "stablecoinBalanceUsd": 84200,
+    "averageBalanceUsd90d": 61800,
+    "escrowsCompleted": 38,
+    "escrowsDisputed": 1,
+    "onTimeDeliveryRate": 0.96,
+    "repaymentsOnTime": 16,
+    "repaymentsLate": 1,
+    "defaults": 0,
+    "rwaProtocolInteractions": 12,
+    "complianceAttestations": 3,
+    "unknownContractInteractions90d": 2,
+    "riskyProtocolExposurePct": 0.04,
+    "bridgeFailureCount": 0,
+    "mixerInteractions": 0,
+    "sanctionsHit": false,
+    "dataSources": ["pharos-indexer", "escrow-ledger", "attestation-registry", "rwa-events"],
+    "lastUpdatedHoursAgo": 2
+  },
+  "context": {
+    "requestedExposureUsd": 5000
+  },
+  "action": {
+    "amountUsd": 5000,
+    "network": "pharos-mainnet",
+    "knownContract": true,
+    "missionAligned": true
+  }
+}
+

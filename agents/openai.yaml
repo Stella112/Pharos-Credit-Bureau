@@ -1,0 +1,8 @@
+interface:
+  display_name: "Pharos Credit Bureau"
+  short_description: "Counterparty risk reports for Pharos agents"
+  brand_color: "#0F766E"
+  default_prompt: "Use $pharos-credit-bureau to assess this Pharos counterparty and decide whether the agent should proceed, cap exposure, require escrow, or reject."
+policy:
+  allow_implicit_invocation: true
+

@@ -1,8 +1,22 @@
-# Pharos Credit Bureau
+# Pharos Credit Bureau Skill
 
 Counterparty risk intelligence for AI agents on Pharos.
 
-Pharos Credit Bureau scores wallets, agents, protocols, and RealFi counterparties before an agent lends, hires, delegates, routes, or releases funds. It produces a risk band, confidence score, risk flags, recommended exposure cap, and a Sentinel-gated execution decision.
+This repository is a Codex Skill. The main entry point is [`SKILL.md`](./SKILL.md). Pharos Credit Bureau scores wallets, agents, protocols, and RealFi counterparties before an agent lends, hires, delegates, routes, or releases funds. It produces a risk band, confidence score, risk flags, recommended exposure cap, and a Sentinel-gated execution decision.
+
+## Skill Invocation
+
+Use:
+
+```text
+$pharos-credit-bureau
+```
+
+Example:
+
+```text
+Use $pharos-credit-bureau to assess this Pharos agent before I send 5,000 USDC. Tell me whether to proceed, cap exposure, require escrow, or reject.
+```
 
 ## MVP Demo
 
@@ -30,6 +44,13 @@ Run the CLI demo:
 
 ```bash
 npm run demo
+```
+
+Generate a deterministic skill report from a request file:
+
+```bash
+npm run report -- assets/credit-request-prime.json
+npm run report -- assets/credit-request-risky.json
 ```
 
 Run tests:
@@ -72,8 +93,16 @@ This keeps the bureau useful for AI-native execution without pretending an advis
 
 ```text
 .
+├── SKILL.md
+├── agents/openai.yaml
+├── assets/credit-request-prime.json
+├── assets/credit-request-risky.json
 ├── data/sample-profiles.json
 ├── index.html
+├── references/profile-schema.md
+├── references/scoring-rubric.md
+├── references/sentinel-policy.md
+├── scripts/credit-report.js
 ├── scripts/demo.js
 ├── scripts/serve.js
 ├── src/app.js
@@ -89,4 +118,3 @@ This keeps the bureau useful for AI-native execution without pretending an advis
 - Add signed credit receipts for agent workflows.
 - Store completed escrow outcomes as bureau input.
 - Add API mode for Pharos Agent Center integrations.
-

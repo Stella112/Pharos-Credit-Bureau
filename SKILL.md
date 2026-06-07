@@ -1,0 +1,117 @@
+---
+name: pharos-credit-bureau
+description: Generate Pharos counterparty credit reports and Sentinel-gated action decisions for wallets, AI agents, DAOs, protocols, and RealFi participants. Use when an agent must assess trust, reputation, creditworthiness, exposure limits, escrow requirements, lending/delegation/payment risk, or whether to interact with another wallet or protocol on Pharos.
+---
+
+# Pharos Credit Bureau
+
+Produce an agent-readable credit report before funds, authority, liquidity, or work are delegated to a Pharos counterparty.
+
+## Core Principle
+
+The bureau scores counterparty risk. Sentinel gates execution.
+
+Default to read-only analysis. Do not send a transaction, approve a contract interaction, or treat a score as execution permission without a concrete action review and user confirmation where required.
+
+## Bureau Flow
+
+1. Capture the subject: wallet, agent, DAO, protocol, or counterparty address.
+2. Capture the intended action: amount, asset, network, target contract, mission, deadline, and whether escrow is available.
+3. Gather available signals from user input, Pharos indexers, escrow/task history, attestations, protocol registries, or bundled sample profiles.
+4. Build a profile using `references/profile-schema.md`.
+5. Score the profile using `references/scoring-rubric.md` or run `node scripts/credit-report.js <request.json>`.
+6. Apply Sentinel using `references/sentinel-policy.md` or the SDK function `reviewActionWithCredit`.
+7. Return a Credit Bureau Report and action decision in the output format below.
+
+## Inputs
+
+Required:
+
+- network (`pharos-mainnet` or `pharos-atlantic-testnet`),
+- subject address or profile,
+- subject type (`wallet`, `agent`, `dao`, `protocol`, or `unknown`),
+- intended action or interaction reason,
+- requested exposure amount,
+- available data sources and freshness.
+
+Useful:
+
+- wallet age,
+- transaction counts and failure rate,
+- stablecoin balances,
+- escrow completion and dispute history,
+- repayment history,
+- RWA/compliance attestations,
+- risky or unknown contract exposure,
+- sanctions/mixer/compliance flags,
+- whether a known contract or allowlist exists.
+
+Use `assets/credit-request-prime.json` and `assets/credit-request-risky.json` as request templates.
+
+## Deterministic Report CLI
+
+When Node.js is available and the user provides a structured request, prefer the CLI:
+
+```bash
+node scripts/credit-report.js assets/credit-request-prime.json
+node scripts/credit-report.js assets/credit-request-risky.json
+```
+
+Request shape:
+
+```json
+{
+  "profile": {},
+  "context": { "requestedExposureUsd": 5000 },
+  "action": {
+    "amountUsd": 5000,
+    "network": "pharos-mainnet",
+    "knownContract": true,
+    "missionAligned": true
+  },
+  "policy": {}
+}
+```
+
+If no live data is available, clearly label the report as sample-data, user-provided, or low-confidence.
+
+## Output Format
+
+Return the result in this order:
+
+1. Decision summary: proceed, cap exposure, require escrow, require confirmation, reject, or insufficient data.
+2. Credit Bureau Report: score, confidence, risk band, exposure cap, main factors, and risk flags.
+3. Sentinel Decision: approve, block, or require confirmation, with reasons.
+4. Counterparty Profile: address, type, network, data sources, freshness, and assumptions.
+5. Risk Analysis: reliability, liquidity, RealFi repayment, compliance, unknown-contract exposure, and operational history.
+6. Exposure Policy: maximum recommended exposure, escrow requirement, monitoring interval, and exit condition.
+7. Compliance Receipt: sanctions/KYC assumptions, privacy notes, blocked conditions.
+8. Agent Accountability Ledger: signals used, confidence limits, dissenting risks, and final responsibility owner.
+9. Execution Plan: read-only checks first; transaction plan only after explicit user request and Sentinel approval.
+10. Mistake Memory: what would make the score wrong and what to monitor next.
+
+## Sentinel Rules
+
+Block or escalate when:
+
+- the subject has a sanctions hit, mixer exposure, or default history,
+- the network is unsupported,
+- the target contract is unknown and policy requires allowlisting,
+- the requested amount exceeds the bureau exposure cap,
+- data is stale or confidence is below policy,
+- the action is outside the user's stated mission,
+- the user has not explicitly confirmed a mainnet write.
+
+For moderate-risk counterparties, prefer capped exposure plus escrow over direct transfer.
+
+## Bundled Resources
+
+- `src/creditBureau.js`: reusable scoring and Sentinel review functions.
+- `scripts/credit-report.js`: deterministic JSON report CLI.
+- `scripts/demo.js`: compare the bundled sample counterparties.
+- `data/sample-profiles.json`: demo profiles.
+- `references/profile-schema.md`: supported profile fields.
+- `references/scoring-rubric.md`: score and confidence model.
+- `references/sentinel-policy.md`: execution gate policy.
+- `index.html`: optional local dashboard demo.
+
