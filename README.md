@@ -46,6 +46,10 @@ npm run live -- --address 0x530d077fbe88add82736eb825fb1e202ed93b147 --amount 50
 
 Live mode fetches real Pharos chain ID, latest block, native balance, sent transaction count/nonce, and contract code from Pharos JSON-RPC. It does not fabricate repayment, escrow, token, sanctions, or attestation data. Missing signals lower confidence.
 
+### Cross-skill signal: Clearing House settlement history
+
+On Pharos Atlantic testnet, the bureau also reads the counterparty's **real settlement track record** from the [Pharos Clearing House](https://github.com/Stella112/Pharos-Clearing-House) escrow contract — paging its `EscrowFunded` / `EscrowReleased` / `EscrowRefunded` events on-chain. Completed escrows raise the reliability factor; timed-out refunds count against it, and `escrowHistory` flips from inferred to observed. This is a live, composable link between two skills — an address that actually settles through Clearing House earns a measurably better score. Override the contract with `escrowAddress`.
+
 If the default Pharos RPC times out on your network, pass a fallback RPC:
 
 ```bash

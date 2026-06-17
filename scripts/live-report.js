@@ -66,6 +66,7 @@ try {
   console.log(JSON.stringify({
     decisionSummary: sentinel.decision,
     liveSignals: profile.rawLiveSignals,
+    clearingHouseSettlements: profile.clearingHouseSettlements || null,
     explorerUrl: profile.explorerUrl,
     creditBureauReport: report,
     sentinelDecision: sentinel,
