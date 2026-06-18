@@ -13,6 +13,21 @@ The bureau scores counterparty risk. Sentinel gates execution.
 
 Default to read-only analysis. Do not send a transaction, approve a contract interaction, or treat a score as execution permission without a concrete action review and user confirmation where required.
 
+## Prerequisites
+
+- **Node 18+** for the report CLIs and SDK; optional **Foundry** (`cast`) for raw on-chain reads.
+- The subject address to assess. No private key is needed for analysis (read-only).
+- Network and contract addresses resolve from `assets/networks.json`.
+
+## Capability Index
+
+| User Need | Capability | Detailed Instructions |
+| --- | --- | --- |
+| "assess a counterparty", "is this wallet/agent creditworthy", "can I trust / pay / lend to this address" | `node scripts/live-report.js --address <addr>` | → references/scoring-rubric.md |
+| "score a structured profile", "rate this counterparty from data I have" | `node scripts/credit-report.js <request.json>` | → references/profile-schema.md |
+| "should I let this action through", "gate a payment by credit / exposure" | SDK `reviewActionWithCredit` | → references/sentinel-policy.md |
+| "read this address's on-chain history / settlement record" | live RPC + `cast logs` (Clearing House events) | → references/scoring-rubric.md |
+
 ## Bureau Flow
 
 1. Capture the subject: wallet, agent, DAO, protocol, or counterparty address.
